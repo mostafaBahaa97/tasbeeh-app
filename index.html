@@ -18,11 +18,51 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
+      // Register service worker for PWA functionality
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        window.addEventListener('load', async () => {
+          try {
+            // Try to register the service worker in public folder first
+            let registration = await navigator.serviceWorker.register('/sw.js', {
+              scope: '/'
+            }).catch(() => {
+              // Fallback to service-worker.js in root
+              return navigator.serviceWorker.register('/service-worker.js', {
+                scope: '/'
+              });
+            });
+            
+            console.log('Service Worker registered:', registration);
+            
+            // Check for updates periodically
+            setInterval(() => {
+              registration.update();
+            }, 60000); // Check every minute
+            
+            // Listen for updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'activated') {
+                  console.log('New service worker activated');
+                }
+              });
+            });
+          } catch (error) {
+            console.log('Service Worker registration failed:', error);
+          }
         });
       }
+
+      // Handle beforeinstallprompt for better PWA support
+      window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('Install prompt fired');
+        // The prompt will be handled by React component
+      });
+
+      window.addEventListener('appinstalled', () => {
+        console.log('App installed successfully');
+      });
     </script>
   </body>
 </html>

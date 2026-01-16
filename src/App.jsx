@@ -21,16 +21,15 @@ const App = () => {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
 
   useEffect(() => {
-    const beforeInstallPrompt = (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      // Automatically show the prompt after 2 seconds
-      setTimeout(() => {
-        e.prompt();
-      }, 2000);
+    // Listen for PWA ready event to get install status
+    const handlePWAReady = (event) => {
+      console.log('PWA Ready:', event.detail);
+      setDeferredPrompt(window.pwaInstaller?.prompt || null);
     };
-    window.addEventListener('beforeinstallprompt', beforeInstallPrompt);
-    return () => window.removeEventListener('beforeinstallprompt', beforeInstallPrompt);
+    
+    window.addEventListener('pwaready', handlePWAReady);
+    
+    return () => window.removeEventListener('pwaready', handlePWAReady);
   }, []);
 
   useEffect(() => {

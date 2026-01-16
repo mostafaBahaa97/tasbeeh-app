@@ -27,75 +27,192 @@
     <meta name="color-scheme" content="light dark" />
     
     <title>Tasbeeh App - تسبيح</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #pwa-install-banner {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 9999;
+        background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+        color: white;
+        padding: 16px;
+        text-align: center;
+        box-shadow: 0 -4px 20px rgba(79, 70, 229, 0.3);
+        animation: slideUp 0.3s ease-out;
+      }
+      #pwa-install-banner.show {
+        display: block;
+      }
+      @keyframes slideUp {
+        from {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      #pwa-install-banner button {
+        margin: 0 8px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      #pwa-install-btn {
+        background: white;
+        color: #4f46e5;
+      }
+      #pwa-install-btn:active {
+        transform: scale(0.95);
+      }
+      #pwa-close-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+      #pwa-close-btn:active {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    </style>
   </head>
   <body>
+    <div id="pwa-install-banner">
+      <div style="margin-bottom: 12px; font-size: 16px; font-weight: 600;">
+        📱 حمّل التطبيق على هاتفك | Download our app
+      </div>
+      <div>
+        <button id="pwa-install-btn">تحميل الآن | Install Now</button>
+        <button id="pwa-close-btn">إغلاق | Close</button>
+      </div>
+    </div>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     
-    <!-- Service Worker Registration with Enhanced Support -->
+    <!-- PWA Installation Manager -->
     <script>
-      // Check if service workers are supported
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', async () => {
-          try {
-            console.log('Attempting to register service worker...');
-            
-            // Register service worker from public folder
-            const registration = await navigator.serviceWorker.register('/sw.js', {
-              scope: '/',
-              updateViaCache: 'none'
-            });
-            
-            console.log('✓ Service Worker registered successfully:', registration.scope);
-            
-            // Check for updates periodically
-            setInterval(() => {
-              registration.update().catch(err => console.log('Update check failed:', err));
-            }, 3600000); // Check every hour
-            
-            // Handle updates
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('✓ New service worker update available');
-                }
-              });
-            });
-            
-            // Check if we're in standalone mode (app installed)
-            if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
-              console.log('✓ App running in standalone mode');
-              document.body.classList.add('standalone-mode');
-            }
-            
-          } catch (error) {
-            console.log('✗ Service Worker registration failed:', error);
-          }
-        });
+      // Global PWA state
+      window.pwaInstaller = {
+        prompt: null,
+        userChoice: null,
+        isInstallable: false,
         
-        // Handle controller change
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          console.log('✓ Service Worker controller changed');
+        async init() {
+          const banner = document.getElementById('pwa-install-banner');
+          const installBtn = document.getElementById('pwa-install-btn');
+          const closeBtn = document.getElementById('pwa-close-btn');
+          
+          // Check if already installed
+          if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('✓ App already in standalone mode');
+            return;
+          }
+          
+          // Listen for install prompt
+          window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            this.prompt = e;
+            this.isInstallable = true;
+            console.log('✓ beforeinstallprompt event fired');
+            
+            // Show banner after 3 seconds
+            setTimeout(() => {
+              banner.classList.add('show');
+            }, 3000);
+          });
+          
+          // Install button handler
+          installBtn.addEventListener('click', async () => {
+            if (this.prompt) {
+              try {
+                this.prompt.prompt();
+                this.userChoice = await this.prompt.userChoice;
+                
+                if (this.userChoice.outcome === 'accepted') {
+                  console.log('✓ User accepted installation');
+                  banner.classList.remove('show');
+                  this.prompt = null;
+                } else {
+                  console.log('✗ User dismissed installation');
+                }
+              } catch (error) {
+                console.log('Installation prompt error:', error);
+              }
+            } else {
+              console.log('No install prompt available, redirecting to install info...');
+              this.showManualInstallGuide();
+            }
+          });
+          
+          // Close button handler
+          closeBtn.addEventListener('click', () => {
+            banner.classList.remove('show');
+          });
+          
+          // Listen for app installed event
+          window.addEventListener('appinstalled', () => {
+            console.log('✓ App successfully installed');
+            banner.classList.remove('show');
+          });
+          
+          // Register Service Worker
+          if ('serviceWorker' in navigator) {
+            try {
+              const reg = await navigator.serviceWorker.register('/sw.js', {
+                scope: '/',
+                updateViaCache: 'none'
+              });
+              console.log('✓ Service Worker registered:', reg.scope);
+              
+              // Check for updates
+              setInterval(() => {
+                reg.update().catch(err => console.log('Update check failed:', err));
+              }, 3600000);
+              
+              navigator.serviceWorker.addEventListener('controllerchange', () => {
+                console.log('✓ Service Worker updated');
+              });
+            } catch (error) {
+              console.log('✗ Service Worker registration failed:', error);
+            }
+          }
+          
+          // Send a signal to React for manual install UI
+          window.dispatchEvent(new CustomEvent('pwaready', { detail: { isInstallable: this.isInstallable } }));
+        },
+        
+        showManualInstallGuide() {
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+          let message = '';
+          
+          if (isIOS) {
+            message = 'iOS: اضغط على مشاركة ↗️ ثم اختر "إضافة إلى الشاشة الرئيسية"\niOS: Tap Share ↗️ then "Add to Home Screen"';
+          } else {
+            message = 'Android: اضغط على القائمة ⋮ ثم اختر "تثبيت التطبيق"\nAndroid: Tap Menu ⋮ then "Install app"';
+          }
+          
+          alert(message);
+        }
+      };
+      
+      // Initialize when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          window.pwaInstaller.init();
         });
       } else {
-        console.log('⚠ Service Workers not supported in this browser');
+        window.pwaInstaller.init();
       }
-
-      // Prevent default touchmove to enable app-like behavior
-      document.addEventListener('touchmove', (e) => {
-        if (e.touches.length > 1) e.preventDefault();
-      }, { passive: false });
-
-      // Disable double-tap zoom for better UX on mobile
-      let lastTouchEnd = 0;
-      document.addEventListener('touchend', (e) => {
-        const now = Date.now();
-        if (now - lastTouchEnd <= 300) {
-          e.preventDefault();
-        }
-        lastTouchEnd = now;
-      }, false);
     </script>
   </body>
 </html>

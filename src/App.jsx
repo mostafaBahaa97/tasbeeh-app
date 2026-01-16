@@ -24,6 +24,10 @@ const App = () => {
     const beforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
+      // Automatically show the prompt after 2 seconds
+      setTimeout(() => {
+        e.prompt();
+      }, 2000);
     };
     window.addEventListener('beforeinstallprompt', beforeInstallPrompt);
     return () => window.removeEventListener('beforeinstallprompt', beforeInstallPrompt);
@@ -100,26 +104,6 @@ const App = () => {
       {/* Theme Toggle Button */}
       {screen !== 'splash' && (
         <div className="fixed top-20 right-4 z-50 flex gap-3 items-start">
-          {/* Install Button */}
-          {deferredPrompt && (
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={async () => {
-                if (deferredPrompt) {
-                  deferredPrompt.prompt();
-                  const result = await deferredPrompt.userChoice;
-                  if (result.outcome === 'accepted') {
-                    setDeferredPrompt(null);
-                  }
-                }
-              }}
-              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl transition-all ${t.button} text-white shadow-lg`}
-              title="Install App"
-            >
-              ⬇️
-            </motion.button>
-          )}
-
           <div> 
             <motion.button
               whileTap={{ scale: 1.9 }}

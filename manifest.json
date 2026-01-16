@@ -1,0 +1,48 @@
+{
+  "name": "Tasbeeh App - تسبيح",
+  "short_name": "Tasbeeh",
+  "description": "Simple tasbeeh counter app - تطبيق تسبيح بسيط",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "./public/tasbeeh.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./public/tasbeeh.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./public/tasbeeh.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "أذكار الصباح",
+      "short_name": "الصباح",
+      "description": "بدء أذكار الصباح",
+      "url": "/?type=morning",
+      "icons": [{ "src": "./public/tasbeeh.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "أذكار المساء",
+      "short_name": "المساء",
+      "description": "بدء أذكار المساء",
+      "url": "/?type=evening",
+      "icons": [{ "src": "./public/tasbeeh.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}

@@ -17,6 +17,7 @@ const App = () => {
   const [azkarList, setAzkarList] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [repeatCount, setRepeatCount] = useState(0);
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('tasbeeh-theme') || 'dark';
@@ -86,22 +87,48 @@ const App = () => {
         `}
       </style>
 
-      {/* Theme Toggle */}
+      {/* Theme Toggle Button */}
       {screen !== 'splash' && (
-        <div className="fixed top-20 right-4 z-50 flex gap-2">
-          {['dark', 'light', 'classic'].map(th => (
-            <button
-              key={th}
-              onClick={() => setTheme(th)}
-              className={`w-10 h-10 rounded-full border-2 transition-all ${
-                theme === th ? 'scale-110 border-white' : 'border-transparent opacity-60'
-              } ${
-                th === 'dark' ? 'bg-gray-900' : 
-                th === 'light' ? 'bg-white' : 
-                'bg-amber-100'
-              }`}
-            />
-          ))}
+        <div className="fixed top-4 right-4 z-50">
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setShowThemeMenu(!showThemeMenu)}
+            className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl transition-all ${t.button} text-white shadow-lg`}
+            title="Change Theme"
+          >
+            🎨
+          </motion.button>
+          
+          {/* Theme Menu */}
+          <AnimatePresence>
+            {showThemeMenu && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.9 }}
+                className={`absolute top-16 right-0 ${t.card} border-2 rounded-2xl p-4 shadow-2xl flex flex-col gap-3 min-w-max`}
+              >
+                {['dark', 'light', 'classic'].map(th => (
+                  <motion.button
+                    key={th}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setTheme(th);
+                      setShowThemeMenu(false);
+                    }}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                      theme === th 
+                        ? `${t.button} text-white scale-105` 
+                        : `${t.bg} ${t.textSub} hover:opacity-80`
+                    }`}
+                  >
+                    {th === 'dark' ? '🌙 Dark' : th === 'light' ? '☀️ Light' : '🌰 Classic'}
+                  </motion.button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
 

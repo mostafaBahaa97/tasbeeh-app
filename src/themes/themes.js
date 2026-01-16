@@ -9,10 +9,10 @@ export const themes = {
       ring: 'stroke-emerald-400'
     },
     light: {
-      bg: 'bg-gradient-to-br from-gray-50 via-white to-gray-100',
-      card: 'bg-white/80 backdrop-blur-sm border-gray-200',
+      bg: 'bg-gradient-to-br from-white via-blue-50 to-white',
+      card: 'bg-white/95 backdrop-blur-sm border-blue-100',
       text: 'text-gray-900',
-      textSub: 'text-gray-600',
+      textSub: 'text-gray-500',
       button: 'bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600',
       progress: 'bg-blue-500',
       ring: 'stroke-blue-400'

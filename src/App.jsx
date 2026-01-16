@@ -18,6 +18,16 @@ const App = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [repeatCount, setRepeatCount] = useState(0);
   const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+  useEffect(() => {
+    const beforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', beforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', beforeInstallPrompt);
+  }, []);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('tasbeeh-theme') || 'dark';
@@ -89,46 +99,68 @@ const App = () => {
 
       {/* Theme Toggle Button */}
       {screen !== 'splash' && (
-        <div className="fixed top-4 right-4 z-50">
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setShowThemeMenu(!showThemeMenu)}
-            className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl transition-all ${t.button} text-white shadow-lg`}
-            title="Change Theme"
-          >
-            🎨
-          </motion.button>
-          
-          {/* Theme Menu */}
-          <AnimatePresence>
-            {showThemeMenu && (
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.9 }}
-                className={`absolute top-16 right-0 ${t.card} border-2 rounded-2xl p-4 shadow-2xl flex flex-col gap-3 min-w-max`}
-              >
-                {['dark', 'light', 'classic'].map(th => (
-                  <motion.button
-                    key={th}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      setTheme(th);
-                      setShowThemeMenu(false);
-                    }}
-                    className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                      theme === th 
-                        ? `${t.button} text-white scale-105` 
-                        : `${t.bg} ${t.textSub} hover:opacity-80`
-                    }`}
-                  >
-                    {th === 'dark' ? '🌙 Dark' : th === 'light' ? '☀️ Light' : '🌰 Classic'}
-                  </motion.button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+        <div className="fixed top-4 right-4 z-50 flex gap-3 items-start">
+          {/* Install Button */}
+          {deferredPrompt && (
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={async () => {
+                if (deferredPrompt) {
+                  deferredPrompt.prompt();
+                  const result = await deferredPrompt.userChoice;
+                  if (result.outcome === 'accepted') {
+                    setDeferredPrompt(null);
+                  }
+                }
+              }}
+              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl transition-all ${t.button} text-white shadow-lg`}
+              title="Install App"
+            >
+              ⬇️
+            </motion.button>
+          )}
+
+          <div>
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setShowThemeMenu(!showThemeMenu)}
+              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl transition-all ${t.button} text-white shadow-lg`}
+              title="Change Theme"
+            >
+              🎨
+            </motion.button>
+            
+            {/* Theme Menu */}
+            <AnimatePresence>
+              {showThemeMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.9 }}
+                  className={`absolute top-16 right-0 ${t.card} border-2 rounded-2xl p-4 shadow-2xl flex flex-col gap-3 min-w-max`}
+                >
+                  {['dark', 'light', 'classic'].map(th => (
+                    <motion.button
+                      key={th}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setTheme(th);
+                        setShowThemeMenu(false);
+                      }}
+                      className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                        theme === th 
+                          ? `${t.button} text-white scale-105` 
+                          : `${t.bg} ${t.textSub} hover:opacity-80`
+                      }`}
+                    >
+                      {th === 'dark' ? '🌙 Dark' : th === 'light' ? '☀️ Light' : '🌰 Classic'}
+                    </motion.button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       )}
 

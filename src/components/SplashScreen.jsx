@@ -19,8 +19,8 @@ const SplashScreen = ({ theme }) => {
       >
         <motion.h1 
           className="text-7xl font-bold mb-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.5, duration: 1 }}
         >
           تسبيح

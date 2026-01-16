@@ -99,7 +99,7 @@ const App = () => {
 
       {/* Theme Toggle Button */}
       {screen !== 'splash' && (
-        <div className="fixed top-4 right-4 z-50 flex gap-3 items-start">
+        <div className="fixed top-20 right-4 z-50 flex gap-3 items-start">
           {/* Install Button */}
           {deferredPrompt && (
             <motion.button
@@ -120,9 +120,9 @@ const App = () => {
             </motion.button>
           )}
 
-          <div>
+          <div> 
             <motion.button
-              whileTap={{ scale: 0.9 }}
+              whileTap={{ scale: 1.9 }}
               onClick={() => setShowThemeMenu(!showThemeMenu)}
               className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl transition-all ${t.button} text-white shadow-lg`}
               title="Change Theme"

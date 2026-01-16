@@ -2,68 +2,100 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/tasbeeh.svg" />
-    <link rel="manifest" href="manifest.json">
-
-    <link rel="icon" type="image/x-icon"  href="icons/icon-192.png">
-    <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="shortcut icon" href="/tasbeeh.svg" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    
+    <!-- iOS Web App Meta Tags -->
+    <link rel="apple-touch-icon" href="/tasbeeh.svg" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Tasbeeh" />
-    <meta name="description" content="تطبيق تسبيح بسيط وسهل الاستخدام" />
+    
+    <!-- Android Web App Meta Tags -->
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="Tasbeeh App" />
+    
+    <!-- Viewport and General Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
+    <meta name="description" content="تطبيق تسبيح بسيط وسهل الاستخدام - Simple Tasbeeh Counter App" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="color-scheme" content="light dark" />
+    
     <title>Tasbeeh App - تسبيح</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Service Worker Registration with Enhanced Support -->
     <script>
-      // Register service worker for PWA functionality
+      // Check if service workers are supported
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', async () => {
           try {
-            // Try to register the service worker in public folder first
-            let registration = await navigator.serviceWorker.register('/sw.js', {
-              scope: '/'
-            }).catch(() => {
-              // Fallback to service-worker.js in root
-              return navigator.serviceWorker.register('/service-worker.js', {
-                scope: '/'
-              });
+            console.log('Attempting to register service worker...');
+            
+            // Register service worker from public folder
+            const registration = await navigator.serviceWorker.register('/sw.js', {
+              scope: '/',
+              updateViaCache: 'none'
             });
             
-            console.log('Service Worker registered:', registration);
+            console.log('✓ Service Worker registered successfully:', registration.scope);
             
             // Check for updates periodically
             setInterval(() => {
-              registration.update();
-            }, 60000); // Check every minute
+              registration.update().catch(err => console.log('Update check failed:', err));
+            }, 3600000); // Check every hour
             
-            // Listen for updates
+            // Handle updates
             registration.addEventListener('updatefound', () => {
               const newWorker = registration.installing;
               newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'activated') {
-                  console.log('New service worker activated');
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('✓ New service worker update available');
                 }
               });
             });
+            
+            // Check if we're in standalone mode (app installed)
+            if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
+              console.log('✓ App running in standalone mode');
+              document.body.classList.add('standalone-mode');
+            }
+            
           } catch (error) {
-            console.log('Service Worker registration failed:', error);
+            console.log('✗ Service Worker registration failed:', error);
           }
         });
+        
+        // Handle controller change
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          console.log('✓ Service Worker controller changed');
+        });
+      } else {
+        console.log('⚠ Service Workers not supported in this browser');
       }
 
-      // Handle beforeinstallprompt for better PWA support
-      window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('Install prompt fired');
-        // The prompt will be handled by React component
-      });
+      // Prevent default touchmove to enable app-like behavior
+      document.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 1) e.preventDefault();
+      }, { passive: false });
 
-      window.addEventListener('appinstalled', () => {
-        console.log('App installed successfully');
-      });
+      // Disable double-tap zoom for better UX on mobile
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+          e.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
     </script>
   </body>
 </html>

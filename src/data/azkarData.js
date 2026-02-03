@@ -133,9 +133,27 @@ export const AZKAR_DATA = {
       id: 15,
       type: "morning",
       category: "tasbih",
+      text: "اللَّهُمَّ صَلِّ وَسَلِّمْ وَبَارِكْ على نَبِيِّنَا مُحمَّد",
+      repeat: 10,
+      order: 15,
+      source: "صحيح مسلم"
+    },
+    {
+      id: 16,
+      type: "morning",
+      category: "tasbih",
+      text: "أسْتَغْفِرُ اللهَ وَأتُوبُ إلَيْهِ",
+      repeat: 100,
+      order: 16,
+      source: "صحيح مسلم"
+    },
+    {
+      id: 17,
+      type: "morning",
+      category: "tasbih",
       text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
       repeat: 100,
-      order: 15,
+      order: 17,
       source: "صحيح مسلم"
     }
   ],
@@ -270,11 +288,29 @@ export const AZKAR_DATA = {
     },
     {
       id: 115,
+      type: "morning",
+      category: "tasbih",
+      text: "اللَّهُمَّ صَلِّ وَسَلِّمْ وَبَارِكْ على نَبِيِّنَا مُحمَّد",
+      repeat: 10,
+      order: 15,
+      source: "صحيح مسلم"
+    },
+    {
+      id: 116,
+      type: "morning",
+      category: "tasbih",
+      text: "أسْتَغْفِرُ اللهَ وَأتُوبُ إلَيْهِ",
+      repeat: 100,
+      order: 16,
+      source: "صحيح مسلم"
+    },
+    {
+      id: 117,
       type: "evening",
       category: "tasbih",
       text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
       repeat: 100,
-      order: 15,
+      order: 17,
       source: "صحيح مسلم"
     }
   ]

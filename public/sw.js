@@ -1,18 +1,23 @@
 const CACHE_NAME = 'tasbeeh-v1';
+const RUNTIME_CACHE = 'tasbeeh-runtime-v1';
+
 const urlsToCache = [
   '/',
   '/index.html',
-  '/manifest.webmanifest'
+  '/manifest.webmanifest',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 // Install event
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlsToCache).catch(() => {});
-    })
+      return cache.addAll(urlsToCache).catch(() => {
+        console.log('Some assets failed to cache during install');
+      });
+    }).then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 // Activate event
@@ -21,17 +26,16 @@ self.addEventListener('activate', event => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
+          if (cacheName !== CACHE_NAME && cacheName !== RUNTIME_CACHE) {
             return caches.delete(cacheName);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// Fetch event - Network first, fallback to cache
+// Fetch event - Network first with cache fallback
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') {
     return;
@@ -44,7 +48,7 @@ self.addEventListener('fetch', event => {
           return response;
         }
         const responseToCache = response.clone();
-        caches.open(CACHE_NAME).then(cache => {
+        caches.open(RUNTIME_CACHE).then(cache => {
           cache.put(event.request, responseToCache).catch(() => {});
         });
         return response;

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import ZikrCard from "./ZikrCard";
 
-const AzkarScreen = ({ theme, azkarList, currentIndex, repeatCount, handleRepeat, resetApp }) => {
+const AzkarScreen = ({ theme, azkarList, currentIndex, repeatCount, handleRepeat, resetApp, goToNextZikr, goToPrevZikr }) => {
   const t = theme;
   const currentZikr = azkarList[currentIndex];
   const progress = azkarList.length > 0 ? (currentIndex / azkarList.length) * 100 : 0;
@@ -42,6 +42,9 @@ const AzkarScreen = ({ theme, azkarList, currentIndex, repeatCount, handleRepeat
           handleRepeat={handleRepeat}
           circumference={circumference}
           strokeOffset={strokeOffset}
+          onSkip={goToNextZikr}
+          onPrev={goToPrevZikr}
+          canGoPrev={currentIndex > 0}
         />
       )}
     </motion.div>

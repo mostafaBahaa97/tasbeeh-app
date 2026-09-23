@@ -72,6 +72,24 @@ const App = () => {
     }
   };
 
+  // تخطي الذكر الحالي والانتقال للي بعده مباشرة (من غير ما تخلص العداد)
+  const goToNextZikr = () => {
+    if (currentIndex < azkarList.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setRepeatCount(azkarList[currentIndex + 1].repeat);
+    } else {
+      setScreen('complete');
+    }
+  };
+
+  // الرجوع للذكر اللي قبل الحالي (لو ضغطت بالغلط)
+  const goToPrevZikr = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+      setRepeatCount(azkarList[currentIndex - 1].repeat);
+    }
+  };
+
   const resetApp = () => {
     setScreen('selection');
     setSelectedType(null);
@@ -164,6 +182,8 @@ const App = () => {
             repeatCount={repeatCount}
             handleRepeat={handleRepeat}
             resetApp={resetApp}
+            goToNextZikr={goToNextZikr}
+            goToPrevZikr={goToPrevZikr}
           />
         )}
 

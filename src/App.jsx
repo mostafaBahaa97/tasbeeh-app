@@ -200,7 +200,9 @@ const App = () => {
       {screen !== 'splash' && (
         <div className="fixed bottom-4 left-0 right-0 text-center">
           <p className={`text-sm ${t.textSub}`}>
-            Made with 🤍 by Mostafa Bahaa
+            Made with 🤍 by <a href="https://mostafa-s-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-500">
+              Mostafa Bahaa
+            </a>
           </p>
         </div>
       )}

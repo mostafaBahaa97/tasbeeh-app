@@ -1,5 +1,5 @@
-const CACHE_NAME = 'tasbeeh-app-v1';
-const RUNTIME_CACHE = 'tasbeeh-runtime-v1';
+const CACHE_NAME = 'tasbeeh-app-v2';
+const RUNTIME_CACHE = 'tasbeeh-runtime-v2';
 
 // Assets to cache on install
 const ASSETS_TO_CACHE = [

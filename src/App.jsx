@@ -7,6 +7,7 @@ import SelectionScreen from './components/SelectionScreen';
 import AzkarScreen from './components/AzkarScreen';
 import CompleteScreen from './components/CompleteScreen';
 import CounterScreen from './components/CounterScreen';
+import ShareModal from './components/ShareModal';
 
 
 
@@ -18,6 +19,7 @@ const App = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [repeatCount, setRepeatCount] = useState(0);
   const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
 
   useEffect(() => {
@@ -118,7 +120,7 @@ const App = () => {
         `}
       </style>
 
-      {/* Theme Toggle Button */}
+      {/* Theme Toggle Button + Share Button */}
       {screen !== 'splash' && (
         <div className="fixed top-20 right-4 z-50 flex gap-3 items-start">
           <div> 
@@ -162,8 +164,27 @@ const App = () => {
               )}
             </AnimatePresence>
           </div>
+
+          {/* Share Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setShowShareModal(true)}
+            className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl transition-all ${t.button} text-white shadow-lg`}
+            title="Share App"
+          >
+            🔗
+          </motion.button>
         </div>
       )}
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        theme={t}
+      />
+
 
       <AnimatePresence mode="wait">
         {screen === 'splash' && (
